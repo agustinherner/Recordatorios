@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Recordatorios</string>
+
+    <!-- Textos de la pantalla inicial. Centralizados acá y leídos con stringResource()
+         (Módulo 1 · U1 · Tema 3, "Estructura y organización de un proyecto Android"). -->
+    <string name="titulo_pantalla">Mis recordatorios</string>
+    <string name="sin_recordatorios">No hay recordatorios para mostrar</string>
+    <!-- %1$d, %2$d… son parámetros que se completan desde el código -->
+    <string name="resumen">%1$d recordatorios · %2$d sin completar · %3$d categorías</string>
+    <string name="vence">Vence: %1$s</string>
+    <string name="ubicacion">Ubicación: %1$s</string>
+    <string name="aviso">Aviso: %1$s</string>
+</resources>
