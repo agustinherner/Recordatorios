@@ -36,6 +36,17 @@ fun validarDescripcion(descripcion: String?): String? {
     } else null
 }
 
+/** Regla de la categoría: obligatoria y debe ser una de las opciones definidas. */
+fun validarCategoria(categoria: Categoria?, disponibles: Collection<Categoria>): String? = when {
+    categoria == null -> "Seleccioná una categoría"
+    categoria !in disponibles -> "La categoría no pertenece a las opciones disponibles"
+    else -> null
+}
+
+/** Regla de la prioridad: debe estar seleccionada. */
+fun validarPrioridad(prioridad: Prioridad?): String? =
+    if (prioridad == null) "Seleccioná una prioridad" else null
+
 /**
  * Regla de la fecha límite (opcional). Formato esperado "AAAA-MM-DD".
  * Las partes se convierten con toIntOrNull(): un texto como "abc" no

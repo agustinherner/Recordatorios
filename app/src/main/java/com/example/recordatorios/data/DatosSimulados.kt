@@ -23,6 +23,9 @@ object DatosSimulados {
     val HOGAR = Categoria("Hogar")
     val PERSONAL = Categoria("Personal")
 
+    /** Opciones de categoría que ofrece el formulario (la validación exige que sea una de estas). */
+    val categoriasDisponibles: List<Categoria> = listOf(TRABAJO, ESTUDIO, SALUD, HOGAR, PERSONAL)
+
     /**
      * MAP categoría → color (ARGB como Long).
      * Se guarda como Long y no como androidx.compose.ui.graphics.Color para

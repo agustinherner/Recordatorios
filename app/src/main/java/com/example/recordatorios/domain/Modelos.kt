@@ -67,19 +67,19 @@ data class Recordatorio(
     val aviso: String? = null          // ej.: "30 min antes"
 )
 
+/** Prioridades que se ofrecen en el formulario, de mayor a menor. */
+val PRIORIDADES: List<Prioridad> get() = listOf(Prioridad.Alta, Prioridad.Media, Prioridad.Baja)
+
 /**
- * Estado de la PANTALLA (no del recordatorio).
- *
- * Evita combinaciones contradictorias del tipo "cargando = true y además
- * error != null" (Módulo 1 · U2 · Tema 2, "Sealed classes e interfaces
- * selladas"). Cada estado lleva solo la información que necesita.
+ * Datos que completa la persona en el formulario de creación (Actividad 2).
+ * No incluye el id: lo asigna el repositorio al guardar.
  */
-sealed interface EstadoPantalla {
-    object Cargando : EstadoPantalla
-    data class ConDatos(val recordatorios: List<Recordatorio>) : EstadoPantalla
-    object Vacio : EstadoPantalla
-    data class Error(val mensaje: String) : EstadoPantalla
-}
+data class DatosNuevoRecordatorio(
+    val titulo: String,
+    val descripcion: String?,
+    val categoria: Categoria,
+    val prioridad: Prioridad
+)
 
 // ---------------------------------------------------------------------------
 // FUNCIONES DE EXTENSIÓN (Módulo 1 · U2 · Tema 2). Agregan comportamiento al
