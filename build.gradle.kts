@@ -3,4 +3,6 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
+    // Actividad 3: KSP genera el código de Room a partir de las anotaciones.
+    alias(libs.plugins.ksp) apply false
 }

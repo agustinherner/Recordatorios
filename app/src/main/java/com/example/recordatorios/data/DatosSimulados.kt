@@ -2,6 +2,7 @@ package com.example.recordatorios.data
 
 import com.example.recordatorios.domain.Categoria
 import com.example.recordatorios.domain.EstadoRecordatorio
+import com.example.recordatorios.domain.OrdenListado
 import com.example.recordatorios.domain.Prioridad
 import com.example.recordatorios.domain.Recordatorio
 import com.example.recordatorios.domain.crearRecordatorio
@@ -9,9 +10,11 @@ import com.example.recordatorios.domain.estaPendiente
 import com.example.recordatorios.domain.marcarCompletado
 
 // ---------------------------------------------------------------------------
-// DATOS SIMULADOS Y COLECCIONES (Módulo 1 · U2 · Tema 1: List, Set, Map,
-// map/filter). En módulos siguientes esto se reemplaza por Room / la nube;
-// por eso las pantallas reciben los datos y no los crean.
+// DATOS DE EJEMPLO Y COLECCIONES (Módulo 1 · U2 · Tema 1: List, Set, Map,
+// map/filter).
+// Actividad 3: estos recordatorios ya NO son la fuente de la interfaz (ahora
+// es Room). Se usan como contenido inicial del SERVIDOR SIMULADO, así la
+// primera sincronización descarga datos remotos a Room, y en las previews.
 // ---------------------------------------------------------------------------
 
 object DatosSimulados {
@@ -60,25 +63,28 @@ object DatosSimulados {
      * escrita) para demostrar que la validación los descarta.
      */
     private val intentosDeCarga = listOf(
-        crearRecordatorio(1, "Entregar Actividad 1 de Mobile", ESTUDIO, Prioridad.Alta,
+        crearRecordatorio("ejemplo-01", "Entregar Actividad 1 de Mobile", ESTUDIO, Prioridad.Alta,
             descripcion = "PDF con capturas y link al repositorio", fechaLimite = "2026-10-30",
             aviso = "1 día antes"),
-        crearRecordatorio(2, "Reunión con proveedor de harina", TRABAJO, Prioridad.Alta,
+        crearRecordatorio("ejemplo-02", "Reunión con proveedor de harina", TRABAJO, Prioridad.Alta,
             fechaLimite = "2026-10-24", ubicacion = "Depósito Toay", aviso = "30 min antes"),
-        crearRecordatorio(3, "Turno control anual", SALUD, Prioridad.Media,
+        crearRecordatorio("ejemplo-03", "Turno control anual", SALUD, Prioridad.Media,
             fechaLimite = "2026-11-05", ubicacion = "Centro médico"),
-        crearRecordatorio(4, "Pagar servicios del mes", HOGAR, Prioridad.Alta,
+        crearRecordatorio("ejemplo-04", "Pagar servicios del mes", HOGAR, Prioridad.Alta,
             fechaLimite = "2026-10-25"),
-        crearRecordatorio(5, "Leer módulo 2 de Mobile", ESTUDIO, Prioridad.Media),
-        crearRecordatorio(6, "Comprar regalo de cumpleaños", PERSONAL, Prioridad.Baja,
+        crearRecordatorio("ejemplo-05", "Leer módulo 2 de Mobile", ESTUDIO, Prioridad.Media),
+        crearRecordatorio("ejemplo-06", "Comprar regalo de cumpleaños", PERSONAL, Prioridad.Baja,
             descripcion = null),
-        crearRecordatorio(7, "Revisar stock semanal", TRABAJO, Prioridad.Media,
+        crearRecordatorio("ejemplo-07", "Revisar stock semanal", TRABAJO, Prioridad.Media,
             ubicacion = "Local Santa Rosa"),
-        crearRecordatorio(8, "Ir al gimnasio", SALUD, Prioridad.Baja, aviso = "18:00"),
-        crearRecordatorio(9, "Ok", PERSONAL, Prioridad.Baja),                       // inválido: título corto
-        crearRecordatorio(10, "Renovar seguro del auto", HOGAR, Prioridad.Media,
+        crearRecordatorio("ejemplo-08", "Ir al gimnasio", SALUD, Prioridad.Baja, aviso = "18:00"),
+        crearRecordatorio("ejemplo-09", "Ok", PERSONAL, Prioridad.Baja),                       // inválido: título corto
+        crearRecordatorio("ejemplo-10", "Renovar seguro del auto", HOGAR, Prioridad.Media,
             fechaLimite = "2026-13-40")                                                // inválido: fecha
     )
+
+    /** Fecha fija (septiembre de 2026) para los ejemplos: cualquier cambio posterior de la persona es "más reciente". */
+    const val MARCA_TIEMPO_EJEMPLOS: Long = 1_790_000_000_000L
 
     /** Mensajes de los registros descartados (para mostrarlos o registrarlos). */
     val erroresDeCarga: List<String> = intentosDeCarga
@@ -92,10 +98,10 @@ object DatosSimulados {
         .mapNotNull { it.getOrNull() }
         .map { r ->
             when (r.id) {
-                5L -> r.copy(estado = EstadoRecordatorio.EnCurso)
-                6L, 8L -> r.marcarCompletado("2026-10-20")
+                "ejemplo-05" -> r.copy(estado = EstadoRecordatorio.EnCurso)
+                "ejemplo-06", "ejemplo-08" -> r.marcarCompletado("2026-10-20")
                 else -> r
-            }
+            }.copy(actualizadoEn = MARCA_TIEMPO_EJEMPLOS)
         }
 
     /**
@@ -124,6 +130,19 @@ fun List<Recordatorio>.titulosPendientes(): List<String> = soloPendientes().map 
 /** Orden para mostrar: pendientes primero y, dentro de ellos, mayor prioridad primero. */
 fun List<Recordatorio>.ordenadosParaMostrar(): List<Recordatorio> =
     sortedWith(compareBy<Recordatorio> { !it.estaPendiente() }.thenByDescending { it.prioridad.nivel })
+
+/**
+ * Ordena según la preferencia guardada en DataStore (Actividad 3).
+ * when exhaustivo sobre el enum: si se agrega un criterio nuevo, el
+ * compilador obliga a contemplarlo acá.
+ */
+fun List<Recordatorio>.ordenadosPor(orden: OrdenListado): List<Recordatorio> = when (orden) {
+    OrdenListado.PRIORIDAD -> ordenadosParaMostrar()
+    // Sin fecha al final. "AAAA-MM-DD" se ordena bien como texto.
+    OrdenListado.FECHA_LIMITE -> sortedWith(compareBy<Recordatorio> { it.fechaLimite == null }.thenBy { it.fechaLimite })
+    OrdenListado.RECIENTES -> sortedByDescending { it.actualizadoEn }
+    OrdenListado.ALFABETICO -> sortedBy { it.titulo.lowercase() }
+}
 
 /** MAP categoría → cantidad de recordatorios (agrupación). */
 fun List<Recordatorio>.cantidadPorCategoria(): Map<Categoria, Int> =

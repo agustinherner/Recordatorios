@@ -1,0 +1,81 @@
+{
+    "recordatorios": [
+        {
+            "id": "ejemplo-01",
+            "titulo": "Entregar Actividad 1 de Mobile",
+            "descripcion": "PDF con capturas y link al repositorio",
+            "categoria": "Estudio",
+            "prioridad": "ALTA",
+            "estado": "PENDIENTE",
+            "fechaLimite": "2026-10-30",
+            "aviso": "1 día antes",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-02",
+            "titulo": "Reunión con proveedor de harina",
+            "categoria": "Trabajo",
+            "prioridad": "ALTA",
+            "estado": "PENDIENTE",
+            "fechaLimite": "2026-10-24",
+            "ubicacion": "Depósito Toay",
+            "aviso": "30 min antes",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-03",
+            "titulo": "Turno control anual",
+            "categoria": "Salud",
+            "prioridad": "MEDIA",
+            "estado": "PENDIENTE",
+            "fechaLimite": "2026-11-05",
+            "ubicacion": "Centro médico",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-04",
+            "titulo": "Pagar servicios del mes",
+            "categoria": "Hogar",
+            "prioridad": "ALTA",
+            "estado": "PENDIENTE",
+            "fechaLimite": "2026-10-25",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-05",
+            "titulo": "Leer módulo 2 de Mobile",
+            "categoria": "Estudio",
+            "prioridad": "MEDIA",
+            "estado": "EN_CURSO",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-06",
+            "titulo": "Comprar regalo de cumpleaños",
+            "categoria": "Personal",
+            "prioridad": "BAJA",
+            "estado": "COMPLETADO",
+            "fechaCompletado": "2026-10-20",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-07",
+            "titulo": "Revisar stock semanal",
+            "categoria": "Trabajo",
+            "prioridad": "MEDIA",
+            "estado": "PENDIENTE",
+            "ubicacion": "Local Santa Rosa",
+            "actualizadoEn": 1790000000000
+        },
+        {
+            "id": "ejemplo-08",
+            "titulo": "Ir al gimnasio",
+            "categoria": "Salud",
+            "prioridad": "BAJA",
+            "estado": "COMPLETADO",
+            "fechaCompletado": "2026-10-20",
+            "aviso": "18:00",
+            "actualizadoEn": 1790000000000
+        }
+    ]
+}

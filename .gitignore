@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Actividad 3: configuración local del servicio remoto (ver remote.properties.example)
+remote.properties
+servidor-json/node_modules

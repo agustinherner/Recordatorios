@@ -28,10 +28,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.recordatorios.data.DatosSimulados
+import com.example.recordatorios.domain.EstadoSync
 import com.example.recordatorios.domain.Prioridad
 import com.example.recordatorios.domain.Recordatorio
 import com.example.recordatorios.domain.estaPendiente
 import com.example.recordatorios.domain.etiqueta
+import com.example.recordatorios.domain.tieneCambiosSinConfirmar
 import com.example.recordatorios.ui.theme.RecordatoriosTheme
 
 /**
@@ -81,6 +83,11 @@ fun RecordatorioCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                // Actividad 3: indica si el cambio todavía no fue confirmado por el servidor.
+                if (recordatorio.tieneCambiosSinConfirmar()) {
+                    Spacer(Modifier.height(8.dp))
+                    EtiquetaSincronizacion(recordatorio.estadoSync)
+                }
             }
         }
     }
@@ -100,6 +107,17 @@ fun Etiqueta(texto: String, color: Color, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Etiqueta del estado de sincronización. Se comunica con TEXTO y no solo con
+ * color: "Pendiente de sincronizar" o "Error de sincronización".
+ */
+@Composable
+fun EtiquetaSincronizacion(estadoSync: EstadoSync, modifier: Modifier = Modifier) {
+    val color = if (estadoSync == EstadoSync.ERROR) MaterialTheme.colorScheme.error
+    else MaterialTheme.colorScheme.tertiary
+    Etiqueta(texto = estadoSync.etiqueta(), color = color, modifier = modifier)
+}
+
 /** El color sale del Map categoría → color de la Actividad 1. */
 fun colorDeCategoria(recordatorio: Recordatorio): Color = Color(DatosSimulados.colorDe(recordatorio.categoria))
 
@@ -115,6 +133,10 @@ fun colorDePrioridad(prioridad: Prioridad): Color = when (prioridad) {
 @Composable
 private fun PreviewRecordatorioCard() {
     RecordatoriosTheme {
-        RecordatorioCard(DatosSimulados.recordatorios.first(), onClick = {}, modifier = Modifier.padding(16.dp))
+        RecordatorioCard(
+            DatosSimulados.recordatorios.first().copy(estadoSync = EstadoSync.PENDIENTE),
+            onClick = {},
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }

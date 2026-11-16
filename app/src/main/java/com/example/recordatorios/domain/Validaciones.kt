@@ -87,17 +87,20 @@ fun validarRecordatorio(r: Recordatorio): ResultadoValidacion {
  * excepción al llamador por un dato incorrecto.
  */
 fun crearRecordatorio(
-    id: Long,
+    id: String,
     titulo: String,
     categoria: Categoria,
     prioridad: Prioridad,
     descripcion: String? = null,
     fechaLimite: String? = null,
     ubicacion: String? = null,
-    aviso: String? = null
+    aviso: String? = null,
+    estado: EstadoRecordatorio = EstadoRecordatorio.Pendiente,
+    actualizadoEn: Long = 0L,
+    estadoSync: EstadoSync = EstadoSync.SINCRONIZADO
 ): Result<Recordatorio> {
-    // require protege una regla interna (argumento): un id <= 0 sería un error de programación.
-    require(id > 0) { "El id debe ser positivo" }
+    // require protege una regla interna (argumento): un id vacío sería un error de programación.
+    require(id.isNotBlank()) { "El id no puede estar vacío" }
 
     val candidato = Recordatorio(
         id = id,
@@ -105,9 +108,12 @@ fun crearRecordatorio(
         categoria = categoria,
         prioridad = prioridad,
         descripcion = descripcion?.trim()?.takeIf { it.isNotEmpty() },
-        fechaLimite = fechaLimite,
+        fechaLimite = fechaLimite?.trim()?.takeIf { it.isNotEmpty() },
         ubicacion = ubicacion,
-        aviso = aviso
+        aviso = aviso,
+        estado = estado,
+        actualizadoEn = actualizadoEn,
+        estadoSync = estadoSync
     )
     return when (val resultado = validarRecordatorio(candidato)) {
         ResultadoValidacion.Valido -> Result.success(candidato)

@@ -48,21 +48,27 @@ import com.example.recordatorios.domain.Categoria
 import com.example.recordatorios.domain.LARGO_MAXIMO_DESCRIPCION
 import com.example.recordatorios.domain.Prioridad
 import com.example.recordatorios.ui.componentes.CampoTexto
+import com.example.recordatorios.ui.componentes.PanelEstado
+import com.example.recordatorios.ui.componentes.TipoPanel
 import com.example.recordatorios.ui.componentes.SelectorCategoria
 import com.example.recordatorios.ui.componentes.SelectorPrioridad
 import com.example.recordatorios.ui.theme.RecordatoriosTheme
 
-/** Destino de creación: conecta el ViewModel con la pantalla y procesa el evento de éxito. */
+/**
+ * Destino del formulario: conecta el ViewModel con la pantalla y procesa el evento de éxito.
+ * [idEditar] = null crea; con valor, edita ese recordatorio.
+ */
 @Composable
-fun CrearDestino(
+fun FormularioDestino(
+    idEditar: String?,
     onGuardado: () -> Unit,
     onCancelar: () -> Unit,
-    viewModel: CrearViewModel = viewModel { CrearViewModel(ContenedorDependencias.repositorio) }
+    viewModel: CrearViewModel = viewModel { CrearViewModel(idEditar, ContenedorDependencias.repositorio) }
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Evento de una sola vez: cuando el guardado termina con éxito se vuelve
-    // al listado y el estado se restablece (onExitoProcesado).
+    // a la pantalla anterior y el estado se restablece (onExitoProcesado).
     val envio = uiState.envio
     LaunchedEffect(envio) {
         if (envio is EstadoEnvio.Exito) {
@@ -75,6 +81,7 @@ fun CrearDestino(
         uiState = uiState,
         onTituloChange = viewModel::onTituloChange,
         onDescripcionChange = viewModel::onDescripcionChange,
+        onFechaChange = viewModel::onFechaChange,
         onCategoriaSeleccionada = viewModel::onCategoriaSeleccionada,
         onPrioridadSeleccionada = viewModel::onPrioridadSeleccionada,
         onGuardar = viewModel::onGuardar,
@@ -82,13 +89,14 @@ fun CrearDestino(
     )
 }
 
-/** Formulario de creación: solo muestra el estado y emite eventos. */
+/** Formulario de creación/edición: solo muestra el estado y emite eventos. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrearScreen(
     uiState: CrearUiState,
     onTituloChange: (String) -> Unit,
     onDescripcionChange: (String) -> Unit,
+    onFechaChange: (String) -> Unit,
     onCategoriaSeleccionada: (Categoria) -> Unit,
     onPrioridadSeleccionada: (Prioridad) -> Unit,
     onGuardar: () -> Unit,
@@ -102,7 +110,7 @@ fun CrearScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Nuevo recordatorio") },
+                title = { Text(if (uiState.modoEdicion) "Editar recordatorio" else "Nuevo recordatorio") },
                 navigationIcon = {
                     IconButton(onClick = onCancelar, enabled = editable) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Cancelar y volver")
@@ -111,6 +119,15 @@ fun CrearScreen(
             )
         }
     ) { innerPadding ->
+        // En edición, primero se cargan los datos actuales desde Room.
+        if (uiState.cargandoDatos) {
+            PanelEstado(TipoPanel.Carga, "Cargando recordatorio…", Modifier.padding(innerPadding))
+            return@Scaffold
+        }
+        uiState.errorCarga?.let { mensaje ->
+            PanelEstado(TipoPanel.Error, mensaje, Modifier.padding(innerPadding), textoAccion = "Volver", onAccion = onCancelar)
+            return@Scaffold
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -141,6 +158,16 @@ fun CrearScreen(
                 habilitado = editable,
                 unaLinea = false,
                 lineasMinimas = 3,
+                accionTeclado = ImeAction.Next,
+                onAccionTeclado = { focusManager.moveFocus(FocusDirection.Down) }
+            )
+            CampoTexto(
+                valor = uiState.fechaLimite,
+                onValorChange = onFechaChange,
+                etiqueta = "Fecha límite (opcional)",
+                mensajeError = uiState.errorFecha,
+                textoAyuda = "Formato AAAA-MM-DD, por ejemplo 2026-12-15",
+                habilitado = editable,
                 accionTeclado = ImeAction.Done,
                 onAccionTeclado = { focusManager.clearFocus() }                    // "Listo" cierra el teclado
             )
@@ -226,7 +253,7 @@ private fun PreviewCrearInvalido() {
                 titulo = "Ok", tituloTocado = true,
                 categoriasDisponibles = DatosSimulados.categoriasDisponibles
             ),
-            onTituloChange = {}, onDescripcionChange = {}, onCategoriaSeleccionada = {},
+            onTituloChange = {}, onDescripcionChange = {}, onFechaChange = {}, onCategoriaSeleccionada = {},
             onPrioridadSeleccionada = {}, onGuardar = {}, onCancelar = {}
         )
     }
@@ -244,7 +271,7 @@ private fun PreviewCrearEnviando() {
                 categoriasDisponibles = DatosSimulados.categoriasDisponibles,
                 envio = EstadoEnvio.Enviando
             ),
-            onTituloChange = {}, onDescripcionChange = {}, onCategoriaSeleccionada = {},
+            onTituloChange = {}, onDescripcionChange = {}, onFechaChange = {}, onCategoriaSeleccionada = {},
             onPrioridadSeleccionada = {}, onGuardar = {}, onCancelar = {}
         )
     }

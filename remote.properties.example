@@ -1,0 +1,19 @@
+# ---------------------------------------------------------------------------
+# Configuración del servicio remoto — ARCHIVO DE EJEMPLO
+#
+# 1. Copiá este archivo con el nombre remote.properties (misma carpeta).
+# 2. Completá los valores. remote.properties está en .gitignore: no se sube.
+# 3. Sincronizá Gradle (File > Sync Project with Gradle Files).
+#
+# No escribas acá contraseñas, tokens ni claves reales.
+# ---------------------------------------------------------------------------
+
+# true  = servidor simulado dentro de la app (no requiere nada externo).
+# false = servicio HTTP real en API_BASE_URL (por ejemplo json-server).
+API_SIMULADA=true
+
+# URL base del servicio. Debe terminar en "/".
+#  - Servidor simulado: cualquier URL válida (no se contacta la red).
+#  - json-server en la PC, visto desde el emulador: http://10.0.2.2:3000/
+#  - json-server en la PC, visto desde un celular en la misma Wi-Fi: http://<IP-de-la-PC>:3000/
+API_BASE_URL=https://api.recordatorios.simulado/

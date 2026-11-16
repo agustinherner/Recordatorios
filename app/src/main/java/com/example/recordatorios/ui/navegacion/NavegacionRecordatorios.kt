@@ -9,7 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.recordatorios.ui.crear.CrearDestino
+import com.example.recordatorios.ui.ajustes.AjustesDestino
+import com.example.recordatorios.ui.crear.FormularioDestino
 import com.example.recordatorios.ui.detalle.DetalleDestino
 import com.example.recordatorios.ui.lista.ListaDestino
 
@@ -17,9 +18,8 @@ import com.example.recordatorios.ui.lista.ListaDestino
  * Grafo de navegación de la app.
  *
  * El NavController se crea y se usa SOLO acá. Las pantallas no lo reciben:
- * comunican la intención de la persona con lambdas (onCrearRecordatorio,
- * onRecordatorioClick, onGuardado, onCancelar, onVolver) y este grafo decide
- * a qué ruta corresponde cada una.
+ * comunican la intención de la persona con lambdas y este grafo decide a qué
+ * ruta corresponde cada una.
  */
 @Composable
 fun NavegacionRecordatorios(
@@ -34,22 +34,31 @@ fun NavegacionRecordatorios(
         composable<ListaRoute> {
             ListaDestino(
                 // launchSingleTop evita apilar dos veces el mismo destino si se toca dos veces rápido.
-                onCrearRecordatorio = { navController.navigate(CrearRoute) { launchSingleTop = true } },
-                onRecordatorioClick = { id -> navController.navigate(DetalleRoute(id)) { launchSingleTop = true } }
+                onCrearRecordatorio = { navController.navigate(FormularioRoute()) { launchSingleTop = true } },
+                onRecordatorioClick = { id -> navController.navigate(DetalleRoute(id)) { launchSingleTop = true } },
+                onAbrirAjustes = { navController.navigate(AjustesRoute) { launchSingleTop = true } }
             )
         }
-        composable<CrearRoute> {
-            CrearDestino(
-                // Después de guardar o cancelar se VUELVE con popBackStack():
-                // no se navega otra vez a ListaRoute, que agregaría una copia del listado.
+        composable<FormularioRoute> { entrada ->
+            val ruta = entrada.toRoute<FormularioRoute>()
+            FormularioDestino(
+                idEditar = ruta.idEditar,
+                // Después de guardar o cancelar se VUELVE con popBackStack().
                 onGuardado = { navController.volver() },
                 onCancelar = { navController.volver() }
             )
         }
         composable<DetalleRoute> { entrada ->
-            // toRoute reconstruye el objeto DetalleRoute con su tipo original (id: Long).
+            // toRoute reconstruye el objeto DetalleRoute con su tipo original.
             val ruta = entrada.toRoute<DetalleRoute>()
-            DetalleDestino(id = ruta.id, onVolver = { navController.volver() })
+            DetalleDestino(
+                id = ruta.id,
+                onVolver = { navController.volver() },
+                onEditar = { navController.navigate(FormularioRoute(idEditar = ruta.id)) { launchSingleTop = true } }
+            )
+        }
+        composable<AjustesRoute> {
+            AjustesDestino(onVolver = { navController.volver() })
         }
     }
 }
